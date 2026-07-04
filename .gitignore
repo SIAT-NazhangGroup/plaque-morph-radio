@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data & outputs (do not commit patient data)
+data/
+output/
+feature_excel/
+*.mhd
+*.raw
+*.nii
+*.nii.gz
+*.xlsx
+*.csv
+*.npy
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
