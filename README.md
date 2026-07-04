@@ -4,6 +4,8 @@
 
 本仓库包含 3 个 Jupyter Notebook，分别对应：二维形态指标流水线、三维 PyRadiomics 特征提取、对侧参考层提取与 RR（Remodeling Ratio）指数计算。
 
+> **图像类型说明**：本工具链处理的均为沿血管**中心线**重新采样/正交重建得到的图像（centerline-resliced images），即以血管中心线为基准、垂直于管腔走向的逐层切面。所有面积、直径、厚度、体积等二维/三维指标均基于这种中心线切面计算。
+
 ## 环境依赖
 
 ```bash
@@ -12,9 +14,21 @@ pip install -r requirements.txt
 
 主要依赖：`SimpleITK`、`pyradiomics`、`opencv-python`、`scikit-learn`、`pandas`、`openpyxl`。
 
+## 路径约定
+
+为避免泄露本地绝对路径，Notebook 中所有数据/输出路径均以占位符 `PROJECT_ROOT` 表示，例如：
+
+```python
+lumen_root   = "PROJECT_ROOT/lumen"
+wall_root    = "PROJECT_ROOT/wall"
+output_excel = "PROJECT_ROOT/feature_excel/1.xlsx"
+```
+
+运行前请将 `PROJECT_ROOT` 替换为你本地的数据根目录（或定义 `PROJECT_ROOT = "/path/to/your/data"` 后用 `os.path.join` 拼接）。
+
 ## 数据目录结构（输入格式）
 
-运行前请按下列约定组织数据，并在各 Notebook 中修改路径变量（默认为 `/home/tzl/project/复发分类数据/...`）。
+运行前请按下列约定组织数据，并将 `PROJECT_ROOT` 替换为本地实际路径。
 
 ### 通用约定
 
@@ -23,6 +37,7 @@ pip install -r requirements.txt
 | 图像格式 | MetaImage（`.mhd` + 同名 `.raw`） |
 | 体素间距 | 平面 0.1 × 0.1 mm，层间距 0.5 mm（部分脚本写死） |
 | Mask 标签 | `1` = 管腔（lumen），`2` = 管壁（wall），`0` = 背景 |
+| 图像类型 | 沿血管中心线正交重建的逐层切面（centerline-resliced） |
 | 病例 ID | 推荐 `姓名_数字ID`（空格替换为 `_`） |
 
 ### Notebook 01 所需目录
@@ -131,6 +146,8 @@ project_root/
 ### 输入
 
 各分组文件夹下的 3D T1 图像与分割 mask（见上文目录结构）。
+
+> **是否使用 Mask**：是。PyRadiomics 通过 `extractor.execute(imagePath, maskPath, label=...)` 同时读取图像与对应 mask，仅在与 mask 标签区域对应的体素上计算特征。Mask 标签优先取 `2`（管壁），否则回退到 `1`（管腔）；未标注区域（`0`）被排除。
 
 ### 提取设置
 
