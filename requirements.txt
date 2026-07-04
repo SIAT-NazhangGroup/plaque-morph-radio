@@ -1,0 +1,10 @@
+numpy
+pandas
+opencv-python
+SimpleITK
+scikit-learn
+scipy
+matplotlib
+tqdm
+pyradiomics
+openpyxl
